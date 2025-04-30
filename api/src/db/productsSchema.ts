@@ -7,7 +7,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const productsTable = pgTable("products", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: integer().primaryKey().generatedAlwaysAsIdentity().unique(),
   name: varchar({ length: 255 }).notNull(),
   description: text(),
   image: varchar({ length: 255 }),
