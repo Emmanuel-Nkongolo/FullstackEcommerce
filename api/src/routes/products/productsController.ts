@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { db } from "../../db/index.ts";
-import { productsTable } from "../../db/productsSchema.ts";
+import { db } from "../../db/index";
+import { productsTable, createProductSchema } from "../../db/productsSchema";
 import { eq } from "drizzle-orm";
+import _ from "lodash";
 
 // Responsible for getting the products (All of them)
 export async function listProducts(req: Request, res: Response) {
@@ -37,7 +38,7 @@ export async function createProduct(req: Request, res: Response) {
   try {
     const [product] = await db
       .insert(productsTable)
-      .values(req.body)
+      .values(req.cleanBody)
       .returning();
 
     res.status(201).json(product);
@@ -50,7 +51,8 @@ export async function createProduct(req: Request, res: Response) {
 export async function updateProduct(req: Request, res: Response) {
   try {
     const id = Number(req.params.id);
-    const updatedFields = req.body;
+    const updatedFields = req.cleanBody;
+
     const [product] = await db
       .update(productsTable)
       .set(updatedFields)
@@ -58,7 +60,7 @@ export async function updateProduct(req: Request, res: Response) {
       .returning();
 
     if (product) {
-      res.send("Product was updated successfully");
+      res.json(product);
     } else {
       res.status(404).send({ message: "Product was not found" });
     }
